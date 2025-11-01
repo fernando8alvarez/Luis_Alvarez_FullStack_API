@@ -1,30 +1,59 @@
 import express from "express";
+import type { Request, Response, NextFunction, Express } from "express";
 import dotenv from "dotenv";
-import { db } from "./config/firebase.js";
+import cors from "cors";
+import cookieParser from "cookie-parser";
+import { ClientError } from "./utils/errors/index.js";
+import { response } from "./utils/response.js";
+// import usersRouter from "./modules/users/users.routes.js";
+// import authRouter from "./modules/auth/auth.routes.js";
 
-// Configuración de variables de entorno
 dotenv.config();
 
-const app = express();
+const createApp = (routes: Array<Express>) => {
+  const app = express();
+
+  app.use(cors());
+  app.use(express.json());
+  app.use(cookieParser());
+
+  // Middleware para obtener la IP del cliente
+  app.use((req: Request, res: Response, next: NextFunction) => {
+    const ip =
+      req.headers["x-forwarded-for"]?.toString().split(",")[0] ??
+      req.socket.remoteAddress ??
+      "0.0.0.0";
+    (req as any).clientIp = ip;
+    next();
+  });
+
+  // Rutas modulares
+  routes.forEach((router) => app.use(router));
+
+  // Ruta para manejar 404
+  app.use((req: Request, res: Response) => {
+    throw new ClientError("404 Not Found", 404);
+  });
+
+  // Middleware de manejo de errores
+  app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+    if (err instanceof ClientError) {
+      return response(res, req, err.statusCode, { error: err.message }, true);
+    }
+    response(res, req, 500, { error: "Internal Server Error" }, true);
+  });
+
+  return app;
+};
+
+// Rutas específicas (agrega tus routers aquí)
+const appRouters: Array<Express> = [
+  // usersRouter,
+  // authRouter,
+];
+
+const app = createApp(appRouters);
 const PORT = process.env.PORT || 4566;
-
-app.use(express.json());
-
-app.get("/ping", async (req, res) => {
-  try {
-    // Escribe un documento de prueba
-    await db
-      .collection("test")
-      .doc("ping")
-      .set({ message: "pong", timestamp: Date.now() });
-    // Lee el documento de prueba
-    const doc = await db.collection("test").doc("ping").get();
-    res.json({ data: doc.data() });
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    res.status(500).json({ error: errorMessage });
-  }
-});
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
