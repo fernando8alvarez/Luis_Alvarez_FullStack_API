@@ -31,12 +31,20 @@ export const post = [
     .withMessage(() => new ClientError("Must Not Be Empty", 400))
     .isEmail()
     .withMessage(() => new ClientError("Must Be A Valid Email", 422))
-    // .custom(async (value) => {
-    //   const existingUser = await getUserByEmail(value);
-    //   if (existingUser) throw new ClientError("Email Already Registered", 409);
-    //   return true;
-    // }),
-    ,
+    .custom(async (value) => {
+      const existingUser = await getUserByEmail(value);
+      if (existingUser) throw new ClientError("Email Already Registered", 409);
+      return true;
+    }),
+  check("password")
+    .notEmpty()
+    .withMessage(() => new ClientError("Password is required", 400))
+    .isString()
+    .withMessage(() => new ClientError("Password must be a string", 422))
+    .isLength({ min: 6 })
+    .withMessage(
+      () => new ClientError("Password must be at least 6 characters", 422)
+    ),
   check("firstName")
     .notEmpty()
     .withMessage(() => new ClientError("Must Not Be Empty", 400))

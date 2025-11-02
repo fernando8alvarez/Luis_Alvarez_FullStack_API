@@ -13,6 +13,7 @@ import ClientError from "./utils/errors/index.js";
 
 // Rutas
 import usersRouter from "./routes/users/users.routes.js";
+import authRouter from "./routes/auth/auth.routes.js";
 
 dotenv.config();
 
@@ -50,7 +51,7 @@ const createApp = (routes: Router[]) => {
 // Rutas específicas (agrega tus routers aquí)
 const appRouters: Router[] = [
   usersRouter,
-  // authRouter,
+  authRouter,
 ];
 
 const app = createApp(appRouters);

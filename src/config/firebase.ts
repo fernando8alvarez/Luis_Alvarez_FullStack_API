@@ -24,3 +24,4 @@ admin.initializeApp({
 
 export const db = getFirestore();
 export const auth = getAuth();
+export { admin };
