@@ -1,7 +1,7 @@
-import admin from "firebase-admin";
+import { admin } from "../config/firebase.js";
+import type { Response } from "express";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
-import type { Response } from "express";
 
 dotenv.config();
 
@@ -20,9 +20,14 @@ export const generateToken = async (data: any) => {
 export const generateRefreshToken = async (
   data: any,
   res: Response,
-  ref: string,
+  userId: string,
   indefiniteTime = false
 ) => {
+  // Removed console.log statements for debugging
+  const authCollection = db
+    .collection("users")
+    .doc(userId)
+    .collection("authentication");
   if (!indefiniteTime) {
     const expiresIn = 60 * 60 * 24 * 30; // 30 días
     const refreshToken = jwt.sign(data, secretKeyRefresh, { expiresIn });
@@ -30,7 +35,7 @@ export const generateRefreshToken = async (
     const dataWithExpiration = { ...data, expirationDate, refreshToken };
     delete dataWithExpiration.id;
     delete dataWithExpiration.role;
-    await db.collection(ref).add(dataWithExpiration);
+    await authCollection.add(dataWithExpiration);
 
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
@@ -46,7 +51,7 @@ export const generateRefreshToken = async (
   const dataNormal = { ...data, refreshToken, expirationDate: "indefinite" };
   delete dataNormal.id;
   delete dataNormal.role;
-  await db.collection(ref).add(dataNormal);
+  await authCollection.add(dataNormal);
 
   res.cookie("refreshToken", refreshToken, {
     httpOnly: true,
@@ -57,8 +62,17 @@ export const generateRefreshToken = async (
   return { refreshToken, expirationDate: "indefinite" };
 };
 
-export const destroyToken = async (ref: string, id: string, res: Response) => {
+export const destroyToken = async (
+  userId: string,
+  tokenId: string,
+  res: Response
+) => {
   res.clearCookie("refreshToken");
-  await db.collection(ref).doc(id).delete();
+  await db
+    .collection("users")
+    .doc(userId)
+    .collection("authentication")
+    .doc(tokenId)
+    .delete();
   return true;
 };

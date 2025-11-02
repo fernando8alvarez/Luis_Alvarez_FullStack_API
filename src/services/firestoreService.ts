@@ -1,5 +1,15 @@
 import { db } from "../config/firebase.js";
-import admin from "firebase-admin";
+import { admin } from "../config/firebase.js";
+
+export interface FirebaseEmailData {
+  to: string;
+  message: {
+    subject: string;
+    html: string;
+    attachments?: any[];
+  };
+  attachments?: any[];
+}
 
 // Obtener un documento por ID
 export const getDocument = async (ref: string, id: string) => {
@@ -38,7 +48,6 @@ export const createDocument = async (ref: string, data: any, id?: string) => {
   return getDocument(ref, docId);
 };
 
-
 // Actualizar un documento
 export const updateDocument = async (ref: string, id: string, data: any) => {
   const now = admin.firestore.FieldValue.serverTimestamp();
@@ -62,5 +71,26 @@ export const getUserByEmail = async (email: string) => {
   } catch (error: any) {
     if (error.code === "auth/user-not-found") return null;
     throw error;
+  }
+};
+
+// Enviar email usando Firebase
+export const sendFirebaseEmail = async (
+  emailData: FirebaseEmailData
+): Promise<boolean> => {
+  try {
+    await createDocument(`mail`, {
+      from: "notreply@mi-oasis.com",
+      to: emailData.to,
+      message: {
+        subject: emailData.message.subject,
+        html: emailData.message.html,
+        attachments: emailData?.attachments,
+      },
+    });
+    return true;
+  } catch (error) {
+    console.error("Error sending Firebase email:", error);
+    throw new Error("Error sending Firebase email");
   }
 };
