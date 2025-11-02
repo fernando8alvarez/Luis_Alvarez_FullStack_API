@@ -1,4 +1,4 @@
-export class ClientError extends Error {
+class ClientError extends Error {
   statusCode: number;
   constructor(message: string, statusCode = 400) {
     super(message);
@@ -13,3 +13,5 @@ export class ClientError extends Error {
     };
   }
 }
+
+export default ClientError;
