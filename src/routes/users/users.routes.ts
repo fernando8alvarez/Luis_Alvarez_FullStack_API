@@ -5,7 +5,7 @@ import * as usersSchema from "./users.schemas.js";
 
 const router = Router();
 
-// CRUD básico para usuarios
+// ---------------------------------------- RUTAS ----------------------------------------
 router.get("/users", validateToken, usersSchema.get, usersController.getUsers);
 router.get("/users/:id", validateToken, usersSchema.getById, usersController.getUserById);
 router.post("/users", usersSchema.post, usersController.postUser);
