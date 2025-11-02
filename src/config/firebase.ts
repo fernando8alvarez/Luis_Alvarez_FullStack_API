@@ -1,8 +1,8 @@
 // Firebase Admin
-import { initializeApp, cert } from "firebase-admin/app";
 import type { ServiceAccount } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
 import { getAuth } from "firebase-admin/auth";
+import admin from "firebase-admin";
 
 // Node.js
 import * as dotenv from "dotenv";
@@ -18,8 +18,8 @@ if (!serviceAccountPath) {
 const serviceAccountUrl = pathToFileURL(path.resolve(serviceAccountPath)).href;
 const serviceAccount = (await import(serviceAccountUrl, { assert: { type: "json" } })).default;
 
-initializeApp({
-  credential: cert(serviceAccount as ServiceAccount),
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount as ServiceAccount),
 });
 
 export const db = getFirestore();

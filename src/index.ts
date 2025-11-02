@@ -1,16 +1,22 @@
+// Express
+import type { Request, Response, NextFunction, Router } from "express";
 import express from "express";
-import type { Request, Response, NextFunction, Express } from "express";
+
+// Otras dependencias
+import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import cors from "cors";
-import cookieParser from "cookie-parser";
-import { ClientError } from "./utils/errors/index.js";
-import { response } from "./utils/response.js";
-// import usersRouter from "./modules/users/users.routes.js";
-// import authRouter from "./modules/auth/auth.routes.js";
+
+// Middlewares
+import ErrorHandler from "./middlewares/errorHandler.js";
+import ClientError from "./utils/errors/index.js";
+
+// Rutas
+import usersRouter from "./routes/users/users.routes.js";
 
 dotenv.config();
 
-const createApp = (routes: Array<Express>) => {
+const createApp = (routes: Router[]) => {
   const app = express();
 
   app.use(cors());
@@ -35,20 +41,15 @@ const createApp = (routes: Array<Express>) => {
     throw new ClientError("404 Not Found", 404);
   });
 
-  // Middleware de manejo de errores
-  app.use((err: any, req: Request, res: Response, next: NextFunction) => {
-    if (err instanceof ClientError) {
-      return response(res, req, err.statusCode, { error: err.message }, true);
-    }
-    response(res, req, 500, { error: "Internal Server Error" }, true);
-  });
+  // Middleware de- errores
+  app.use(ErrorHandler);
 
   return app;
 };
 
 // Rutas específicas (agrega tus routers aquí)
-const appRouters: Array<Express> = [
-  // usersRouter,
+const appRouters: Router[] = [
+  usersRouter,
   // authRouter,
 ];
 

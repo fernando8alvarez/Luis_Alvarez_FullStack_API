@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 import axios from "axios";
 import dotenv from "dotenv";
 import type { Request, Response, NextFunction } from "express";
-import { ClientError } from "../utils/errors/index.js";
+import ClientError from "../utils/errors/index.js";
 
 dotenv.config();
 
