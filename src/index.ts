@@ -17,6 +17,8 @@ import usersRouter from "./routes/users/users.routes.js";
 import authRouter from "./routes/auth/auth.routes.js";
 import filesRouter from "./routes/files/files.routes.js";
 
+import { swaggerUi, swaggerSpec } from "./swagger.js";
+
 dotenv.config();
 
 const createApp = (routes: Router[]) => {
@@ -39,12 +41,15 @@ const createApp = (routes: Router[]) => {
   // Rutas modulares
   routes.forEach((router) => app.use(router));
 
+  // Documentación Swagger (debe ir antes del 404)
+  app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
   // Ruta para manejar 404
   app.use((req: Request, res: Response) => {
     throw new ClientError("404 Not Found", 404);
   });
 
-  // Middleware de- errores
+  // Middleware de errores
   app.use(ErrorHandler);
 
   return app;
@@ -54,8 +59,8 @@ const createApp = (routes: Router[]) => {
 const appRouters: Router[] = [usersRouter, authRouter, filesRouter];
 
 const app = createApp(appRouters);
-const PORT = process.env.PORT || 3000;
 
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
