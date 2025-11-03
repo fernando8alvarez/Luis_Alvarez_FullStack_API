@@ -10,6 +10,7 @@ const router = Router();
  * /auth/login:
  *   post:
  *     summary: User login
+ *     description: Authenticates a user and returns a JWT token and refresh token.
  *     tags:
  *       - Auth
  *     requestBody:
@@ -17,17 +18,23 @@ const router = Router();
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             properties:
- *               email:
- *                 type: string
- *               password:
- *                 type: string
+ *             $ref: '#/components/schemas/LoginRequest'
+ *           example:
+ *             email: "user@example.com"
+ *             password: "password123"
  *     responses:
  *       200:
  *         description: Login successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/LoginResponse'
  *       401:
  *         description: Invalid credentials
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: Invalid password
  */
 router.post("/auth/login", authSchema.postLogin, authController.login);
 
@@ -36,6 +43,7 @@ router.post("/auth/login", authSchema.postLogin, authController.login);
  * /auth/logout:
  *   post:
  *     summary: User logout
+ *     description: Logs out the user and invalidates the refresh token.
  *     tags:
  *       - Auth
  *     security:
@@ -43,6 +51,10 @@ router.post("/auth/login", authSchema.postLogin, authController.login);
  *     responses:
  *       200:
  *         description: Logout successful
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: User logged out
  */
 router.post("/auth/logout", validateRefreshToken, authController.logout);
 
@@ -51,6 +63,7 @@ router.post("/auth/logout", validateRefreshToken, authController.logout);
  * /auth/refreshToken:
  *   get:
  *     summary: Refresh JWT token
+ *     description: Returns a new JWT token using a valid refresh token.
  *     tags:
  *       - Auth
  *     security:
@@ -58,16 +71,29 @@ router.post("/auth/logout", validateRefreshToken, authController.logout);
  *     responses:
  *       200:
  *         description: Token refreshed
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/RefreshResponse'
  *       401:
  *         description: Invalid refresh token
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: Invalid refresh token
  */
-router.get("/auth/refreshToken", validateRefreshToken, authController.refreshToken);
+router.get(
+  "/auth/refreshToken",
+  validateRefreshToken,
+  authController.refreshToken
+);
 
 /**
  * @openapi
  * /auth/password-code:
  *   post:
  *     summary: Request password reset code
+ *     description: Sends a verification code to the user's email for password reset.
  *     tags:
  *       - Auth
  *     requestBody:
@@ -75,13 +101,16 @@ router.get("/auth/refreshToken", validateRefreshToken, authController.refreshTok
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             properties:
- *               email:
- *                 type: string
+ *             $ref: '#/components/schemas/PasswordCodeRequest'
+ *           example:
+ *             email: "user@example.com"
  *     responses:
  *       200:
  *         description: Code sent
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: Código enviado
  */
 router.post("/auth/password-code", authController.passwordCode);
 
@@ -90,6 +119,7 @@ router.post("/auth/password-code", authController.passwordCode);
  * /auth/validate-code:
  *   post:
  *     summary: Validate password reset code
+ *     description: Validates the verification code and sends a password reset email if valid.
  *     tags:
  *       - Auth
  *     requestBody:
@@ -97,18 +127,89 @@ router.post("/auth/password-code", authController.passwordCode);
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             properties:
- *               email:
- *                 type: string
- *               code:
- *                 type: string
+ *             $ref: '#/components/schemas/ValidateCodeRequest'
+ *           example:
+ *             email: "user@example.com"
+ *             code: "a1b2c3"
  *     responses:
  *       200:
  *         description: Code valid
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: Email enviado
  *       400:
  *         description: Invalid code
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: Código inválido o expirado
  */
 router.post("/auth/validate-code", authController.validateVerificationCode);
 
+/**
+ * @openapi
+ * components:
+ *   schemas:
+ *     LoginRequest:
+ *       type: object
+ *       properties:
+ *         email:
+ *           type: string
+ *         password:
+ *           type: string
+ *       required:
+ *         - email
+ *         - password
+ *       example:
+ *         email: "user@example.com"
+ *         password: "password123"
+ *     LoginResponse:
+ *       type: object
+ *       properties:
+ *         tokenInfo:
+ *           type: object
+ *           properties:
+ *             token:
+ *               type: string
+ *             expiresIn:
+ *               type: integer
+ *       example:
+ *         tokenInfo:
+ *           token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+ *           expiresIn: 3600
+ *     RefreshResponse:
+ *       type: object
+ *       properties:
+ *         token:
+ *           type: string
+ *         expiresIn:
+ *           type: integer
+ *       example:
+ *         token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+ *         expiresIn: 3600
+ *     PasswordCodeRequest:
+ *       type: object
+ *       properties:
+ *         email:
+ *           type: string
+ *       required:
+ *         - email
+ *       example:
+ *         email: "user@example.com"
+ *     ValidateCodeRequest:
+ *       type: object
+ *       properties:
+ *         email:
+ *           type: string
+ *         code:
+ *           type: string
+ *       required:
+ *         - email
+ *         - code
+ *       example:
+ *         email: "user@example.com"
+ *         code: "a1b2c3"
+
+*/
 export default router;

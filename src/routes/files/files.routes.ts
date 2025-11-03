@@ -16,6 +16,7 @@ const router = Router();
  * /upload:
  *   post:
  *     summary: Upload a file to S3
+ *     description: Uploads a file to the S3 bucket. Requires authentication.
  *     tags:
  *       - Files
  *     security:
@@ -25,16 +26,21 @@ const router = Router();
  *       content:
  *         multipart/form-data:
  *           schema:
- *             type: object
- *             properties:
- *               file:
- *                 type: string
- *                 format: binary
+ *             $ref: '#/components/schemas/FileUploadRequest'
  *     responses:
  *       200:
  *         description: File uploaded successfully
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: File uploaded
+ *               key: "file-uuid-filename.pdf"
  *       400:
  *         description: No file uploaded
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: No file uploaded
  */
 router.post("/upload", validateToken, upload.single("file"), uploadFile);
 
@@ -43,6 +49,7 @@ router.post("/upload", validateToken, upload.single("file"), uploadFile);
  * /download/{key}:
  *   get:
  *     summary: Download a file from S3
+ *     description: Downloads a file from the S3 bucket by its key. Requires authentication.
  *     tags:
  *       - Files
  *     security:
@@ -57,8 +64,17 @@ router.post("/upload", validateToken, upload.single("file"), uploadFile);
  *     responses:
  *       200:
  *         description: File downloaded successfully
+ *         content:
+ *           application/octet-stream:
+ *             schema:
+ *               type: string
+ *               format: binary
  *       404:
  *         description: File not found
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: File not found
  */
 router.get("/download/:key", validateToken, downloadFile);
 
@@ -67,6 +83,7 @@ router.get("/download/:key", validateToken, downloadFile);
  * /rename:
  *   put:
  *     summary: Rename a file in S3
+ *     description: Renames a file in the S3 bucket. Requires authentication.
  *     tags:
  *       - Files
  *     security:
@@ -76,17 +93,25 @@ router.get("/download/:key", validateToken, downloadFile);
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             properties:
- *               oldKey:
- *                 type: string
- *               newKey:
- *                 type: string
+ *             $ref: '#/components/schemas/FileRenameRequest'
+ *           example:
+ *             oldKey: "old-file.pdf"
+ *             newKey: "new-file.pdf"
  *     responses:
  *       200:
  *         description: File renamed successfully
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: File renamed
+ *               oldKey: "old-file.pdf"
+ *               newKey: "new-file.pdf"
  *       400:
  *         description: Invalid input
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: Invalid input
  */
 router.put("/rename", validateToken, putRenameFile, renameFile);
 
@@ -95,6 +120,7 @@ router.put("/rename", validateToken, putRenameFile, renameFile);
  * /public-url/{key}:
  *   get:
  *     summary: Get a public URL for a file in S3
+ *     description: Returns a signed public URL for a file in the S3 bucket. Requires authentication.
  *     tags:
  *       - Files
  *     security:
@@ -112,13 +138,44 @@ router.put("/rename", validateToken, putRenameFile, renameFile);
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 url:
- *                   type: string
+ *               $ref: '#/components/schemas/FilePublicUrlResponse'
+ *             example:
+ *               url: "https://localhost:4566/testing-bucket/file.pdf"
  *       404:
  *         description: File not found
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: File not found
  */
 router.get("/public-url/:key", validateToken, getPublicUrl);
+/**
+ * @openapi
+ * components:
+ *   schemas:
+ *     FileUploadRequest:
+ *       type: object
+ *       properties:
+ *         file:
+ *           type: string
+ *           format: binary
+ *       required:
+ *         - file
+ *     FileRenameRequest:
+ *       type: object
+ *       properties:
+ *         oldKey:
+ *           type: string
+ *         newKey:
+ *           type: string
+ *       required:
+ *         - oldKey
+ *         - newKey
+ *     FilePublicUrlResponse:
+ *       type: object
+ *       properties:
+ *         url:
+ *           type: string
 
+*/
 export default router;
