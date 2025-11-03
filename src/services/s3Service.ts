@@ -1,15 +1,28 @@
-import { S3Client, PutObjectCommand, GetObjectCommand, DeleteObjectCommand, CopyObjectCommand } from '@aws-sdk/client-s3';
+import {
+  S3Client,
+  PutObjectCommand,
+  GetObjectCommand,
+  DeleteObjectCommand,
+  CopyObjectCommand,
+} from "@aws-sdk/client-s3";
 
 const s3 = new S3Client({
-  region: 'us-east-1',
-  endpoint: 'http://localhost:4566',
+  region: process.env.AWS_REGION || "us-east-1",
+  endpoint: process.env.S3_ENDPOINT || "http://localhost:4566",
   forcePathStyle: true,
   credentials: {
-    accessKeyId: 'test',
-    secretAccessKey: 'test',
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID || "test",
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || "test",
   },
 });
 
-const BUCKET = 'testing-bucket';
+const BUCKET = process.env.BUCKET_NAME || "testing-bucket";
 
-export { s3, BUCKET, PutObjectCommand, GetObjectCommand, DeleteObjectCommand, CopyObjectCommand };
+export {
+  s3,
+  BUCKET,
+  PutObjectCommand,
+  GetObjectCommand,
+  DeleteObjectCommand,
+  CopyObjectCommand,
+};
