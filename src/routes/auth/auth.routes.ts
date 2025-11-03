@@ -1,7 +1,7 @@
-import { Router } from "express";
+import { validateRefreshToken } from "../../middlewares/auth.js";
 import * as authController from "./auth.controller.js";
 import authSchema from "./auth.schema.js";
-import { validateRefreshToken } from "../../middlewares/auth.js";
+import { Router } from "express";
 
 const router = Router();
 
@@ -61,11 +61,7 @@ router.post("/auth/logout", validateRefreshToken, authController.logout);
  *       401:
  *         description: Invalid refresh token
  */
-router.get(
-  "/auth/refreshToken",
-  validateRefreshToken,
-  authController.refreshToken
-);
+router.get("/auth/refreshToken", validateRefreshToken, authController.refreshToken);
 
 /**
  * @openapi

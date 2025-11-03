@@ -10,6 +10,8 @@ import {
   deleteDocument,
 } from "../../services/firestoreService.js";
 
+// ---------------------------------------- CONTROLLERS ----------------------------------------
+
 // Obtener todos los usuarios
 export const getUsers = catchedAsync(async (req, res) => {
   const users = await getDocuments("users");

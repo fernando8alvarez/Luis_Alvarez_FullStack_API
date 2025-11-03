@@ -13,6 +13,9 @@ import { v4 as uuidv4 } from "uuid";
 
 const upload = multer({ storage: multer.memoryStorage() });
 
+// ---------------------------------------- CONTROLLERS ----------------------------------------
+
+// Descargar un archivo de S3
 const downloadFile = async (
   req: Request,
   res: Response,
@@ -25,6 +28,7 @@ const downloadFile = async (
   (response.Body as any).pipe(res);
 };
 
+// Renombrar un archivo en S3
 const renameFile = async (req: Request, res: Response, next: NextFunction) => {
   const { oldKey, newKey } = req.body;
 
@@ -41,6 +45,7 @@ const renameFile = async (req: Request, res: Response, next: NextFunction) => {
   res.json({ message: "File renamed", oldKey, newKey });
 };
 
+// Obtener URL pública firmada para un archivo en S3
 const getPublicUrl = async (
   req: Request,
   res: Response,
@@ -52,6 +57,7 @@ const getPublicUrl = async (
   res.json({ url });
 };
 
+// Subir un archivo a S3
 const uploadFile = async (req: Request, res: Response, next: NextFunction) => {
   if (!req.file) {
     return res.status(400).json({ message: "No file uploaded" });

@@ -1,16 +1,18 @@
-// Interfaz para el usuario Firestore
-interface User {
-  id: string;
-  email: string;
-  password: string;
-  role: string;
-  [key: string]: any;
-}
+// Firebase
+import { admin } from "../../config/firebase.js";
+import { FieldValue } from "firebase-admin/firestore";
+
 // Middlewares
 import { response, catchedAsync } from "../../utils/index.js";
 import ClientError from "../../utils/errors/index.js";
+
+// Types
+import type { User } from "../../types/user.types.js";
+
+// Librerias
 import type { Request, Response } from "express";
 import bcrypt from "bcryptjs";
+import crypto from "crypto";
 
 // FirestoreService
 import {
@@ -30,10 +32,6 @@ import {
 // Templates
 import generateVerificationEmail from "../../utils/templates/generateVerificationEmail.js";
 import resetPassword from "../../utils/templates/resetPassword.js";
-
-import { admin } from "../../config/firebase.js";
-import crypto from "crypto";
-import { FieldValue } from "firebase-admin/firestore";
 
 // ---------------------------------------- CONTROLLERS ----------------------------------------
 
@@ -86,7 +84,6 @@ export const login = catchedAsync(async (req: Request, res: Response) => {
     res,
     userFromDB.id
   );
-
 
   await updateDocument("users", userFromDB.id, {
     ...userFromDB,
