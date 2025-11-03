@@ -80,7 +80,7 @@ export const sendFirebaseEmail = async (
 ): Promise<boolean> => {
   try {
     await createDocument(`mail`, {
-      from: "notreply@mi-oasis.com",
+      from: process.env.EMAIL_FROM,
       to: emailData.to,
       message: {
         subject: emailData.message.subject,
