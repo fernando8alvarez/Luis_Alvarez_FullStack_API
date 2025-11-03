@@ -1,15 +1,6 @@
+import type { FirebaseEmailData } from "../types/firebase.types.js";
 import { db } from "../config/firebase.js";
 import { admin } from "../config/firebase.js";
-
-export interface FirebaseEmailData {
-  to: string;
-  message: {
-    subject: string;
-    html: string;
-    attachments?: any[];
-  };
-  attachments?: any[];
-}
 
 // Obtener un documento por ID
 export const getDocument = async (ref: string, id: string) => {

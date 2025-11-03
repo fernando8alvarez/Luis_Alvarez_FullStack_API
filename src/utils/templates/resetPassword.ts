@@ -1,11 +1,4 @@
-export interface ResetPasswordEmail {
-  to: string;
-  message: {
-    subject: string;
-    html: string;
-  };
-  attachments: any[];
-}
+import type { ResetPasswordEmail } from "../../types/email.types.js";
 
 const resetPassword = (email: string, link: string): ResetPasswordEmail => {
   return {

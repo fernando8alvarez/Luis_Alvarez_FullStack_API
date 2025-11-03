@@ -42,12 +42,7 @@ router.get("/users", validateToken, usersSchema.get, usersController.getUsers);
  *       404:
  *         description: User not found
  */
-router.get(
-  "/users/:id",
-  validateToken,
-  usersSchema.getById,
-  usersController.getUserById
-);
+router.get("/users/:id",validateToken,usersSchema.getById,usersController.getUserById);
 
 /**
  * @openapi
@@ -131,11 +126,6 @@ router.put("/users", validateToken, usersSchema.put, usersController.putUser);
  *       400:
  *         description: Invalid input
  */
-router.delete(
-  "/users",
-  validateToken,
-  usersSchema.deleteSchema,
-  usersController.deleteUser
-);
+router.delete("/users", validateToken, usersSchema.deleteSchema, usersController.deleteUser);
 
 export default router;

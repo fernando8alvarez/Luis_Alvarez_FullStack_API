@@ -1,5 +1,6 @@
-import { Router } from "express";
 import { validateToken } from "../../middlewares/auth.js";
+import { putRenameFile } from "./files.schemas.js";
+import { Router } from "express";
 import {
   upload,
   uploadFile,
@@ -7,7 +8,6 @@ import {
   renameFile,
   getPublicUrl,
 } from "./files.controller.js";
-import { putRenameFile } from "./files.schemas.js";
 
 const router = Router();
 

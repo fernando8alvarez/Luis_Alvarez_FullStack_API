@@ -9,7 +9,6 @@ dotenv.config();
 
 const secretKeyRefresh = process.env.JWT_REFRESH_SECRET as string;
 const secretKeyJWT = process.env.JWT_SECRET as string;
-const key = process.env.KEY_FIREBASE as string;
 
 // Middleware para validar el token JWT
 export const validateToken = (

@@ -1,15 +1,8 @@
+import type { VerificationEmail } from "../../types/email.types.js";         
+
 interface User {
   displayName?: string;
   [key: string]: any;
-}
-
-interface VerificationEmail {
-  to: string;
-  message: {
-    subject: string;
-    html: string;
-  };
-  attachments: any[];
 }
 
 const generateVerificationEmail = (
